@@ -413,7 +413,7 @@ function updateCartBadge() {
 }
 
 function getTotal()    { return cart.reduce((s, x) => s + x.price * x.qty, 0); }
-function getLivraison(){ return getTotal() >= 100 ? 0 : 10; }
+function getLivraison(){ return getTotal() >= 200 ? 0 : 10; }
 
 function renderCart() {
   const content = document.getElementById("cartContent");
@@ -444,7 +444,7 @@ function renderCart() {
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;margin-bottom:7px">
         <span style="font-size:11px;font-weight:700;color:var(--text2)">🚚 Livraison offerte dès 200 €</span>
-        <span style="font-size:11px;font-weight:700;color:var(--accent)">${total.toFixed(2).replace(".",",'")}&nbsp;/ 200,00 €</span>
+        <span style="font-size:11px;font-weight:700;color:var(--accent)">${total.toFixed(2).replace(".",",")}&nbsp;/ 200,00 €</span>
       </div>
       <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width .4s ease"></div>
@@ -642,7 +642,7 @@ function showDeliveryForm() {
           </div>
 
           <!-- Liste des relais -->
-          <div id="relais_liste" style="display:none;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px"></div>
+          <div id="relais_liste" style="display:none;max-height:300px;overflow-y:auto;flex-direction:column;gap:8px"></div>
 
           <!-- Relais sélectionné -->
           <div id="relais_selectionne" style="display:none;background:rgba(0,229,255,.07);border:1.5px solid var(--accent,#00e5ff);border-radius:10px;padding:12px 14px;margin-top:10px">
@@ -795,7 +795,12 @@ async function geolocRelais() {
       listeEl.style.display = "none";
       mapEl.innerHTML = `<div id="leafletMap" style="width:100%;height:240px"></div>`;
 
-      await loadLeaflet();
+      try {
+        await loadLeaflet();
+      } catch(e) {
+        mapEl.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:20px;text-align:center">❌ Impossible de charger la carte</div>`;
+        return;
+      }
       if (_leafletMap) { _leafletMap.remove(); _leafletMap = null; }
       _leafletMarkers = [];
 
@@ -1112,13 +1117,16 @@ out body 30;`;
 
 function loadLeaflet() {
   if (window.L) return Promise.resolve();
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const css = document.createElement("link");
     css.rel = "stylesheet"; css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
     document.head.appendChild(css);
     const script = document.createElement("script");
     script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
     script.onload = resolve;
+    script.onerror = () => reject(new Error("Impossible de charger la carte"));
+    const timeout = setTimeout(() => reject(new Error("Timeout chargement carte")), 10000);
+    script.onload = () => { clearTimeout(timeout); resolve(); };
     document.head.appendChild(script);
   });
 }
