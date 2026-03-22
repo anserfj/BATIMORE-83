@@ -1038,7 +1038,7 @@ function CatalogPage({products,setProducts,loading,reload}){
 
     {/* MODAL PRODUIT */}
     {modal&&<div style={{position:"fixed",inset:0,background:"#000000cc",display:"flex",alignItems:"flex-start",justifyContent:"center",zIndex:500,overflowY:"auto",padding:"20px 0 40px"}} onClick={()=>setModal(null)}>
-      <div className="scale-in" style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:"16px",padding:24,width:"100%",maxWidth:600,minHeight:400,overflowY:"visible"}} onClick={e=>e.stopPropagation()}>
+      <div className="scale-in" style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:"16px",padding:24,width:"100%",maxWidth:600,maxHeight:"90vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
           <div style={{fontFamily:"'Bebas Neue'",fontSize:22,letterSpacing:"0.05em"}}>{modal==="new"?"Nouveau produit":"Modifier : "+form.name}</div>
           <button onClick={()=>setModal(null)} style={{background:"none",border:"none",color:C.text3,cursor:"pointer",fontSize:20}}>×</button>
